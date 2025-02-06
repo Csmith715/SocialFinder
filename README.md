@@ -121,8 +121,8 @@ The request body must be a JSON object with the following fields:
 ## Installation
 1. **Clone the repository**:
    ```sh
-   git clone https://github.com/Csmith715/socialFinder.git
-   cd socialFinder
+   git clone https://github.com/Csmith715/SocialFinder.git
+   cd SocialFinder
    
 2. **Set up the virtual environment:**
    ```sh
