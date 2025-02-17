@@ -13,6 +13,12 @@ The request body must be a JSON object with the following fields:
 
 | Field                                   | Type             | Description                                           |
 |-----------------------------------------|------------------|-------------------------------------------------------|
+| `Location`                              | String           | The user's location as a "City, State" string         |
+| `Acceptable Distance`                   | Integer          | The distance a person would be willing to travel      |
+| `Available Times`                       | Array of Strings | One or more of: "Morning", "Afternoon", "Evening"     |
+| `Available Days`                        | Array of Strings | One or more days of the week                          |
+| `Frequency`                             | String           | One of: "Weekly", "Bi-weekly", 'Monthly"              |
+| `Budget`                                | Integer          | The user's budget for an engagement                   |
 | `General Interests`                     | Array of Strings | A list of general interests of the user.              |
 | `Specific Interests`                    | Array of Strings | A list of specific interests.                         |
 | `openness`                              | Integer (1-5)    | Scale representing openness to experience.            |
@@ -29,6 +35,12 @@ The request body must be a JSON object with the following fields:
 ### Example Request
 ```json
 {
+    "Location": "Frisco, Texas",
+    "Acceptable Distance": 30,
+    "Available Times": ["Afternoon", "Evening"],
+    "Available Days": ["Friday", "Saturday", "Sunday"],
+    "Frequency": "Weekly",
+    "Budget": 100,
     "General Interests": ["AI", "Reading", "Sports", "Traveling"],
     "Specific Interests": ["Golf", "Buffalo Bills", "Disney"],
     "openness": 4,
