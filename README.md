@@ -2,11 +2,18 @@
 
 ## Overview
 This is an algorithm for a potential Social Matchmaking app. The algorithm uses a combination of sentence-transformers 
-cosine similarity and euclidean distance measures to find the n most similar matches to a given user's profile. The 
-algorithm has been set up as a Flask API. 
+cosine similarity and euclidean distance measures to find the n most similar matches to a given user's profile. A 
+logistic regression model is also utilized to reinforce the matches based on user feedback. Once enough real time 
+interactions are collected, the model can be trained such that future engagements will now be weighted by the predicted 
+logistic regression compatability score. The full algorithm has been set up as a Flask API. 
 
 It should be noted that the collection of users from which matches are made is currently an artificially generated 
 dataset. These are fake users and will need to be replaced with actual user data when such data is available.
+
+There are also two GET API requests that will need to be used from time to time to update the underlying user embeddings
+and to update and retrain the logistic regression model.
+
+### 1. API POST Request
 
 ### Body
 The request body must be a JSON object with the following fields:
@@ -56,8 +63,8 @@ The request body must be a JSON object with the following fields:
 }
 ```
 
-## Response
-### Success Response
+### Response
+#### Success Response
 **Status Code:** `200 OK`
 
 **Example Response:**
@@ -105,16 +112,6 @@ The request body must be a JSON object with the following fields:
 }
 ```
 
-#### Unauthorized
-**Status Code:** `401 Unauthorized`
-
-**Example Response:**
-```json
-{
-    "error": "Unauthorized. Please provide a valid token."
-}
-```
-
 #### Internal Server Error
 **Status Code:** `500 Internal Server Error`
 
@@ -125,10 +122,56 @@ The request body must be a JSON object with the following fields:
 }
 ```
 
-## Notes
+### Notes
 - Personality trait values must be between 1 and 5.
 - The `Number of Matches` field determines how many recommendations will be returned.
 - Ensure the request is properly formatted as JSON and contains all required fields.
+
+---
+
+### 2. GET /generate-user-embeddings
+
+Generates user embeddings based on user data.
+
+**Request:**
+- Method: GET
+- No parameters required.
+
+**Process:**
+- Loads user data from `social_testing_data_v2.csv`.
+- Embeds selected columns: 'General Interests', 'Specific Interests', 'Tolerance for Political Incorrectness', 'Religious Views', 'Political Opinions', 'Challenges Milestones'.
+- Non-embedding columns include 'openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism', 'Location', 'Acceptable Distance', 'Available Times', 'Available Days', 'Frequency', 'Budget'.
+- Embeddings are generated using a sentence-transformer model and saved to `social_test_embeddings_v2.parquet`.
+
+**Response:**
+- Status Code: 200 OK
+- Embeddings saved locally.
+
+---
+
+### 3. GET /update-social-ml
+
+Updates the social machine learning model using pairwise user data.
+
+**Request:**
+- Method: GET
+- No parameters required.
+
+**Process:**
+- Loads data from `social_validation_data.csv`.
+- Generates embeddings for pairs of users.
+- Trains a Logistic Regression model using the embeddings.
+- Evaluates the model and reports accuracy.
+- Saves the trained model to `social_reinforcement.pkl`.
+
+**Response:**
+- Status Code: 200 OK
+- JSON object containing model accuracy:
+  ```json
+  {"Model Accuracy": 0.92}
+  ```
+
+---
 
 ## Installation
 1. **Clone the repository**:
@@ -151,3 +194,5 @@ The request body must be a JSON object with the following fields:
    python app.py
    
 2. **POST API calls can then be made to:** http://127.0.0.1:5000/social-finder
+3. **GET API requests to retrain the logistic regression model can be made to:** http://127.0.0.1:5000/update-social-ml
+4. **GET API requests to update user data can be made to:** http://127.0.0.1:5000/generate-user-embeddings
